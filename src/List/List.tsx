@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import Log from '../shared/Log';
 import ListItem from './ListItem';
+import useLogs from './useLogs';
 
 // const initialLogData: Log[] = [{
 //   id: 1,
@@ -18,6 +19,7 @@ import ListItem from './ListItem';
 // }];
 
 const List: React.FC = () => {
+  const title = useLogs();
   const [logs, setLogs] = useState<Log[]>([]);
 
   useEffect(() => {
@@ -39,7 +41,8 @@ const List: React.FC = () => {
   }
 
   return <>
-      <table>
+    <h1>{title}</h1>
+    <table>
       <thead>
         <tr>
           <th>From</th>
