@@ -6,6 +6,12 @@
 - Next.js (z.B. für SSR): https://nextjs.org/
 - Zentrales Statemanagement: https://redux.js.org/ oder https://mobx.js.org/README.html
 - React Dev Tools: https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=de
+- Redux async Middleware:
+  - Thunk (Promises)
+  - Saga (Generators)
+  - Redux Observable (RxJS)
+- Blog By Dan Abramov: https://overreacted.io/
+- Blog By Kent C Dodds: https://kentcdodds.com/blog/
 
 ## Filenaming:
 
