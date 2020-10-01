@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
+import { LogsContext } from "../HeadingContext";
 import Log from "../shared/Log";
 
 export default function useLogs() {
-  const [logs, setLogs] = useState<Log[]>([]);
+  const [logs, setLogs] = useContext(LogsContext);
 
   useEffect(() => {
     (async () => {
@@ -10,7 +11,8 @@ export default function useLogs() {
       const data = await response.json();
       setLogs(data);
     })();
-  },[]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[setLogs]);
 
   async function handleDelete(item: Log): Promise<void> {
     const response = await fetch(`http://localhost:3001/logs/${item.id}`, {method: 'DELETE'});
