@@ -4,7 +4,7 @@ export const HeadingContext = React.createContext<[string, React.Dispatch<React.
 
 export const HeadingProvider: React.FC = (props: any) => {
 
-  const [state, setState] = React.useState<string>('');
+  const [state, setState] = React.useState<string>('Klaus ist sehr 😎');
 
   return <HeadingContext.Provider value={[state, setState]} {...props} />
 };
