@@ -1,11 +1,14 @@
 import React from 'react';
 import './App.css';
+import {HeadingProvider} from './HeadingContext';
 import List from './List/List';
 
 function App() {
   return (
     <div className="App">
-      <List />
+      <HeadingProvider>
+        <List />
+      </HeadingProvider>
     </div>
   );
 }

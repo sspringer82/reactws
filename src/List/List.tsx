@@ -4,13 +4,15 @@ import useLogs from './useLogs';
 import './List.scss';
 import { H2 } from './List.styles';
 import styles from './List.module.css';
+import { headingContext } from '../HeadingContext';
 
 const List: React.FC = () => {
   const {logs, handleDelete} = useLogs();
+  const heading = React.useContext(headingContext);
   return <>
-    <h1  style={{textDecoration: 'underline'}} className="heading">My Fancy Time Tracker</h1>
+    <h1 style={{textDecoration: 'underline'}} className="heading">My Fancy Time Tracker</h1>
     <H2>...really fancy</H2>
-    <h3 className={styles.heading3}>Track your times with us!</h3>
+    <h3 className={styles.heading3}>{heading}</h3>
     <table>
       <thead>
         <tr>
