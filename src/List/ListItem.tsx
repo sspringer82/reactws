@@ -1,3 +1,4 @@
+import { Button } from '@material-ui/core';
 import * as React from 'react';
 import Log from '../shared/Log';
 
@@ -13,11 +14,9 @@ const ListItem: React.FC<Props> = ({item, onDelete}) => {
     <td>{item.duration}</td>
     <td>{item.title}</td>
     <td>
-      <button onClick={(e) => {
-        onDelete(item);
-      }}>
-        löschen
-      </button>
+      <Button variant="contained" onClick={(e) => {
+          onDelete(item);
+        }}>löschen</Button>
     </td>
   </tr>;
 }
