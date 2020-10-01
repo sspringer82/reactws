@@ -3,38 +3,39 @@ import { useEffect, useState } from 'react';
 import Log from '../shared/Log';
 import ListItem from './ListItem';
 
-const initialLogData: Log[] = [{
-  id: 1,
-  from: '09:00',
-  until: '10:00',
-  title: 'work',
-  duration: 60
-}, {
-  id: 2,
-  from: '10:00',
-  until: '12:00',
-  title: 'work even more',
-  duration: 120
-}];
+// const initialLogData: Log[] = [{
+//   id: 1,
+//   from: '09:00',
+//   until: '10:00',
+//   title: 'work',
+//   duration: 60
+// }, {
+//   id: 2,
+//   from: '10:00',
+//   until: '12:00',
+//   title: 'work even more',
+//   duration: 120
+// }];
 
 const List: React.FC = () => {
   const [logs, setLogs] = useState<Log[]>([]);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLogs(prevLogs => {
-        return initialLogData;
-      });
-    }, 1000);
+    (async () => {
+      const response = await fetch('http://localhost:3001/logs');
+      const data = await response.json();
+      setLogs(data);
+    })();
   },[]);
 
-  function handleDelete(item: Log): void {
-    console.log('delete Item');
-    // delete elements from state
+  async function handleDelete(item: Log): Promise<void> {
+    const response = await fetch(`http://localhost:3001/logs/${item.id}`, {method: 'DELETE'});
 
-    setLogs((prevLogs) => {
-      return prevLogs.filter((prevLog) => prevLog.id !== item.id);
-    })
+    if (response.status === 200) {
+      setLogs((prevLogs) => {
+        return prevLogs.filter((prevLog) => prevLog.id !== item.id);
+      });
+    }
   }
 
   return <>
