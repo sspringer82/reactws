@@ -1,44 +1,53 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
+import Log from '../shared/Log';
+import Child from './Child';
 
-interface Item {
-  id: number;
-  title: string;
-}
+const initialLogData: Log[] = [{
+  id: 1,
+  from: '09:00',
+  until: '10:00',
+  title: 'work',
+  duration: 60
+}, {
+  id: 2,
+  from: '10:00',
+  until: '12:00',
+  title: 'work even more',
+  duration: 120
+}];
 
 const List: React.FC = () => {
+  const [logs, setLogs] = useState<Log[]>([]);
 
-  const [state, setState] = React.useState<string>('Hallo Welt');
-  // const [state, setState] = React.useState<Item[]>([]);
-
-  React.useEffect(() => {
+  useEffect(() => {
     setTimeout(() => {
-      // setState('Hallo React');
-      setState((prevState) => {
-        return 'Hallo React';
+      setLogs(prevLogs => {
+        return initialLogData;
       });
     }, 5000);
-    return () => {} // handle unmount
-  }, []); // [] 1x initial ausführen
+  },[]);
 
-  const logs = [{
-    id: 1,
-    from: '09:00',
-    until: '10:00',
-    title: 'work',
-    duration: 60
-  }, {
-    id: 2,
-    from: '10:00',
-    until: '12:00',
-    title: 'work even more',
-    duration: 120
-  }];
-
-  
-
-  return <div>{state}</div>;
-
-
+  return <>
+      <table>
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>Until</th>
+          <th>Duration</th>
+          <th>Title</th>
+        </tr>
+      </thead>
+      {logs.map(log => (
+        <tr>
+          <td>{log.from}</td>
+          <td>{log.until}</td>
+          <td>{log.duration}</td>
+          <td>{log.title}</td>
+        </tr>))}
+    </table>
+    <Child item={initialLogData[0]}></Child>
+  </>
 };
 
 export default List;
