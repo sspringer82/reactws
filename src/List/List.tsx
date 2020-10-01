@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import Log from '../shared/Log';
-import Child from './Child';
+import ListItem from './ListItem';
 
 const initialLogData: Log[] = [{
   id: 1,
@@ -25,8 +25,13 @@ const List: React.FC = () => {
       setLogs(prevLogs => {
         return initialLogData;
       });
-    }, 5000);
+    }, 1000);
   },[]);
+
+  function handleDelete(item: Log): void {
+    console.log('delete Item');
+    // delete elements from state
+  }
 
   return <>
       <table>
@@ -36,17 +41,13 @@ const List: React.FC = () => {
           <th>Until</th>
           <th>Duration</th>
           <th>Title</th>
+          <th></th>
         </tr>
       </thead>
-      {logs.map(log => (
-        <tr>
-          <td>{log.from}</td>
-          <td>{log.until}</td>
-          <td>{log.duration}</td>
-          <td>{log.title}</td>
-        </tr>))}
+      <tbody>
+        {logs.map(log => <ListItem key={log.id} item={log} onDelete={handleDelete}/>)}
+      </tbody>
     </table>
-    <Child item={initialLogData[0]}></Child>
   </>
 };
 

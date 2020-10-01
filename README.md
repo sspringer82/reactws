@@ -18,3 +18,10 @@
 - Kein this in Funktionskomponenten
 - Möglichkeit von Statefragmentierung in FCs
 - Möglichkeit mehrere Lifecyle-Funktionen in FCs
+
+## Backend
+
+1. npm install json-server
+2. Datei data.json im Wurzelverzeichnis erstellen
+3. package.json > scripts > "backend": "json-server -p 3001 -w data.json"
+4. auf der Kommandozeile im Verzeichnis, in dem die package.json liegt: npm run backend
