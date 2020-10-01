@@ -12,6 +12,10 @@
   - Redux Observable (RxJS)
 - Blog By Dan Abramov: https://overreacted.io/
 - Blog By Kent C Dodds: https://kentcdodds.com/blog/
+- Immutabilty Libraries
+  - Immutability Helper: https://github.com/kolodny/immutability-helper
+  - Immer.js: https://immerjs.github.io/immer/docs/introduction
+  - Immutable.js: https://immutable-js.github.io/immutable-js/
 
 ## Filenaming:
 

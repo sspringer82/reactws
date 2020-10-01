@@ -31,6 +31,10 @@ const List: React.FC = () => {
   function handleDelete(item: Log): void {
     console.log('delete Item');
     // delete elements from state
+
+    setLogs((prevLogs) => {
+      return prevLogs.filter((prevLog) => prevLog.id !== item.id);
+    })
   }
 
   return <>
