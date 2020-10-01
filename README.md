@@ -19,6 +19,10 @@
 - SCSS / SASS: https://sass-lang.com/
 - Styled Components: https://styled-components.com/
 - Material Components: https://material-ui.com/
+- Form handling:
+  - Formik: https://formik.org/
+  - Redux-Form: https://github.com/redux-form/redux-form
+- Routing: https://reactrouter.com/
 
 ## Filenaming:
 
