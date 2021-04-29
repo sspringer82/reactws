@@ -11,12 +11,6 @@ const List = () => {
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    document.ononline = () => {
-      itemService.applyModifications();
-    };
-  });
-
   return (
     <div>
       {itemService.items.map((item) => (
