@@ -1,0 +1,25 @@
+{
+  "item": [
+    {
+      "id": 1,
+      "amount": 4,
+      "unit": "l",
+      "name": "Milch",
+      "done": true
+    },
+    {
+      "id": 2,
+      "amount": "2",
+      "unit": "kg",
+      "name": "Mehl",
+      "done": true
+    },
+    {
+      "id": 3,
+      "amount": 10,
+      "unit": "St",
+      "name": "Eier",
+      "done": false
+    }
+  ]
+}
