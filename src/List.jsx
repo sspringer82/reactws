@@ -8,8 +8,13 @@ const List = () => {
   const itemService = useItem();
   useEffect(() => {
     itemService.getAll();
-    // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    document.ononline = () => {
+      itemService.applyModifications();
+    };
+  });
 
   return (
     <div>

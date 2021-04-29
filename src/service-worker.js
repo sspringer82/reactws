@@ -12,6 +12,10 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
+import Dexie from 'dexie';
+
+// Any other custom service worker logic can go here.
+import './push';
 
 clientsClaim();
 
@@ -43,14 +47,15 @@ registerRoute(
 
     return true;
   },
-  createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
+  createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html'),
 );
 
 // An example runtime caching route for requests that aren't handled by the
 // precache, in this case same-origin .png requests like those from in public/
 registerRoute(
   // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
+  ({ url }) =>
+    url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
   new StaleWhileRevalidate({
     cacheName: 'images',
     plugins: [
@@ -58,7 +63,7 @@ registerRoute(
       // least-recently used images are removed.
       new ExpirationPlugin({ maxEntries: 50 }),
     ],
-  })
+  }),
 );
 
 // This allows the web app to trigger skipWaiting via
@@ -69,4 +74,161 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// Any other custom service worker logic can go here.
+const db = new Dexie('list');
+db.version(1).stores({
+  items: '&id, amount, unit, name',
+  modification: '&id, type, data',
+});
+
+async function applyModifications() {
+  const modifications = await db.table('modification').toArray();
+  modifications.forEach(async (modification) => {
+    // eslint-disable-next-line default-case
+    switch (modification.type) {
+      case 'create':
+        delete modification.data.id;
+        await fetch('/item', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(modification.data),
+        });
+        break;
+      case 'update':
+        await fetch(`/item/${modification.data.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(modification.data),
+        });
+        break;
+      case 'delete':
+        await fetch(`/item/${modification.data.id}`, {
+          method: 'DELETE',
+          body: JSON.stringify(modification.id),
+        });
+        break;
+    }
+    if (
+      modification.data &&
+      modification.data.id &&
+      modification.data.id.toString().startsWith('l')
+    ) {
+      await db.table('item').delete(modification.data.id);
+    }
+    await db.table('modification').delete(modification.id);
+  });
+}
+
+self.addEventListener('fetch', async (event) => {
+  if (event.request.url.includes('/item')) {
+    // eslint-disable-next-line default-case
+    switch (event.request.method) {
+      case 'GET':
+        event.respondWith(
+          (async () => {
+            let data = [];
+            let isOffline = false;
+            if (navigator.onLine) {
+              try {
+                const response = await fetch('/item');
+                data = await response.json();
+              } catch (e) {
+                isOffline = true;
+              }
+            } else {
+              isOffline = true;
+            }
+            if (isOffline) {
+              data = await db.table('items').toArray();
+            } else {
+              applyModifications();
+              db.table('items').clear();
+              db.table('items').bulkAdd(data);
+            }
+            return new Response(JSON.stringify(data));
+          })(),
+        );
+        break;
+      case 'POST':
+      case 'PUT':
+        event.respondWith(
+          (async () => {
+            const body = await event.request.json();
+            let isOffline = false;
+            let data = null;
+            if (navigator.onLine) {
+              try {
+                const response = await fetch(event.request);
+                data = await response.json();
+              } catch (e) {
+                isOffline = true;
+              }
+            } else {
+              isOffline = true;
+            }
+
+            if (isOffline) {
+              data = { ...body };
+              if (!data.id) {
+                const mods = await db.table('modification').toArray();
+                const localIds = mods
+                  .map((mod) => mod.id.toString())
+                  .filter((mod) => mod.startsWith('l'))
+                  .map((mod) => mod.substring(1, mod.length))
+                  .map((mod) => parseInt(mod, 10));
+                let nextId = 1;
+                if (localIds.length > 0) {
+                  nextId = Math.max(...localIds) + 1;
+                }
+                data.id = `l${nextId}`;
+              }
+              db.table('modification').put({
+                id: data.id,
+                type: data.id.toString().startsWith('l') ? 'create' : 'update',
+                data,
+              });
+              db.table('items').put(data, data.id);
+            } else {
+              applyModifications();
+              db.table('items').put(data);
+            }
+            return new Response(JSON.stringify(data));
+          })(),
+        );
+        break;
+      case 'DELETE':
+        event.respondWith(
+          (async () => {
+            const id = event.request.url.split('/').pop();
+            let isOffline = false;
+            if (navigator.onLine) {
+              try {
+                await fetch(`/item/${id}`, {
+                  method: 'DELETE',
+                });
+              } catch (e) {
+                isOffline = true;
+              }
+            } else {
+              isOffline = true;
+            }
+            if (isOffline) {
+              if (id.toString().startsWith('l')) {
+                db.table('modification').delete(id);
+              } else {
+                db.table('modification').put({
+                  id,
+                  type: 'delete',
+                });
+              }
+              db.table('items').delete(id);
+            } else {
+              applyModifications();
+              db.table('items').delete(id);
+            }
+            return new Response();
+          })(),
+        );
+        break;
+    }
+  }
+});
